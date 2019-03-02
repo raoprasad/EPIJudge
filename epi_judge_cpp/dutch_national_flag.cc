@@ -7,8 +7,19 @@ using std::vector;
 typedef enum { kRed, kWhite, kBlue } Color;
 
 void DutchFlagPartition(int pivot_index, vector<Color>* A_ptr) {
-  // TODO - you fill in here.
-  return;
+	int pivot = (*A_ptr)[pivot_index];
+	int less = 0, curr = 0, more = (*A_ptr).size() - 1;
+	while (curr <= more) {
+		if ((*A_ptr)[curr] == pivot) {
+			curr++;
+		}
+		else if ((*A_ptr)[curr] > pivot) {
+			std::swap((*A_ptr)[curr], (*A_ptr)[more--]);
+		}
+		else {
+			std::swap((*A_ptr)[curr++], (*A_ptr)[less++]);
+		}
+	}
 }
 void DutchFlagPartitionWrapper(TimedExecutor& executor, const vector<int>& A,
                                int pivot_idx) {

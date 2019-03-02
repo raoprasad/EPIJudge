@@ -6,8 +6,16 @@
 using std::vector;
 
 void EvenOdd(vector<int>* A_ptr) {
-  // TODO - you fill in here.
-  return;
+	int size = A_ptr->size();
+	int begin = 0, end = size - 1;
+	while (begin <= end) {
+		if ((*A_ptr)[begin] % 2 == 0) {
+			begin++;
+		}
+		else {
+			std::swap((*A_ptr)[begin], (*A_ptr)[end--]);
+		}
+	}
 }
 void EvenOddWrapper(TimedExecutor& executor, vector<int> A) {
   std::multiset<int> before(begin(A), end(A));

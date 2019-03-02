@@ -1,9 +1,15 @@
 #include <vector>
 #include "test_framework/generic_test.h"
 using std::vector;
+
 double BuyAndSellStockOnce(const vector<double>& prices) {
-  // TODO - you fill in here.
-  return 0.0;
+	double maxprofit = 0.0, currprofit = 0.0;
+	int numdays = prices.size();
+	for (int sellday = 1; sellday <= numdays - 1; sellday++) {
+		currprofit = std::max(currprofit + prices[sellday] - prices[sellday -1], 0.0);
+		maxprofit = std::max(currprofit, maxprofit);
+	}
+	return maxprofit;
 }
 
 int main(int argc, char* argv[]) {
