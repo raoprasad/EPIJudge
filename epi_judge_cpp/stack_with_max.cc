@@ -8,25 +8,38 @@ using std::length_error;
 class Stack {
 private:
 	std::forward_list<int> nodes;
-	std::forward_list<int> maxval;
+	std::forward_list<std::pair<int,int>> maxval;
 public:
 	bool Empty() const {
 	// TODO - you fill in here.
 		return nodes.empty();
 	}
 	int Max() const {
-		return maxval.front();
+		return maxval.front().first;
 	}
 	int Pop() {
 		int val = nodes.front();
 		nodes.pop_front();
-		maxval.pop_front();
+		if (maxval.front().first == val) {
+			
+			if (maxval.front().second == 1) {
+				maxval.pop_front();
+			}
+			else {
+				int& freq = maxval.front().second;
+				freq--;
+			}
+		}
 		return val;
 	}
 	void Push(int x) {
 		nodes.emplace_front(x);
-		if(!maxval.empty()) maxval.emplace_front((x > maxval.front()) ? x : maxval.front());
-		else maxval.emplace_front(x);
+		if (!maxval.empty()) {
+			std::pair<int, int>& currmax = maxval.front();
+			if (currmax.first == x) currmax.second++;
+			else if(currmax.first < x) maxval.emplace_front(std::make_pair(x, 1));
+		}
+		else maxval.emplace_front(std::make_pair(x,1));
 	}
 };
 struct StackOp {
