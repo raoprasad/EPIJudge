@@ -2,26 +2,32 @@
 #include "test_framework/generic_test.h"
 #include "test_framework/serialization_traits.h"
 #include "test_framework/test_failure.h"
+#include <forward_list>
 using std::length_error;
 
 class Stack {
- public:
-  bool Empty() const {
-    // TODO - you fill in here.
-    return true;
-  }
-  int Max() const {
-    // TODO - you fill in here.
-    return 0;
-  }
-  int Pop() {
-    // TODO - you fill in here.
-    return 0;
-  }
-  void Push(int x) {
-    // TODO - you fill in here.
-    return;
-  }
+private:
+	std::forward_list<int> nodes;
+	std::forward_list<int> maxval;
+public:
+	bool Empty() const {
+	// TODO - you fill in here.
+		return nodes.empty();
+	}
+	int Max() const {
+		return maxval.front();
+	}
+	int Pop() {
+		int val = nodes.front();
+		nodes.pop_front();
+		maxval.pop_front();
+		return val;
+	}
+	void Push(int x) {
+		nodes.emplace_front(x);
+		if(!maxval.empty()) maxval.emplace_front((x > maxval.front()) ? x : maxval.front());
+		else maxval.emplace_front(x);
+	}
 };
 struct StackOp {
   std::string op;
