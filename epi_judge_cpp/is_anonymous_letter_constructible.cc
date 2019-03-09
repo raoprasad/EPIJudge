@@ -1,11 +1,27 @@
 #include <string>
 #include "test_framework/generic_test.h"
-using std::string;
+#include <unordered_map>
+
+using namespace std;
 
 bool IsLetterConstructibleFromMagazine(const string& letter_text,
                                        const string& magazine_text) {
-  // TODO - you fill in here.
-  return true;
+	if (letter_text.empty()) return true;
+	else if (magazine_text.empty()) return false;
+
+	unordered_map<char, int> letter;
+	for (char c : letter_text) {
+		letter[tolower(c)]++;
+	}
+	for (char ch : magazine_text) {
+		char c = tolower(ch);
+		if (letter.find(c) != letter.end()){
+			if(letter[c] == 1) letter.erase(c);
+			else letter[c]--;
+		}
+		if (letter.empty()) return true;
+	}
+	return false;
 }
 
 int main(int argc, char* argv[]) {
