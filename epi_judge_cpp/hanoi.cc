@@ -9,9 +9,20 @@ using std::array;
 using std::stack;
 using std::vector;
 const int kNumPegs = 3;
+void hanoi(int a, int b, int c, int n, vector<vector<int>>& res) {
+	if (n == 1) {
+		res.emplace_back(vector<int>({ a,b }));
+	}
+	else {
+		hanoi(a, c, b, n - 1, res);
+		res.emplace_back(vector<int>({ a,b }));
+		hanoi(c, b, a, n - 1, res);
+	}
+}
 vector<vector<int>> ComputeTowerHanoi(int num_rings) {
-  // TODO - you fill in here.
-  return {};
+	vector<vector<int>> res;
+	hanoi(0, 1, 2, num_rings, res);
+	return res;
 }
 void ComputeTowerHanoiWrapper(TimedExecutor& executor, int num_rings) {
   array<stack<int>, kNumPegs> pegs;
