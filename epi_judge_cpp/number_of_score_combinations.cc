@@ -6,30 +6,24 @@ using namespace std;
 
 int NumCombinationsForFinalScore(int final_score,
                                  const vector<int>& individual_play_scores) {
-	set<int> individualScores(individual_play_scores.begin(), individual_play_scores.end());
-	vector<int> combinations(final_score + 1, 0);
-	unordered_map<int, set<set<int>>> uniqPlays;
+	vector<vector<int>> combinations(individual_play_scores.size(), vector<int>(final_score + 1, 0));
 
-	combinations[0] = 1;
-	uniqPlays.emplace(0,set<set<int>>({{}}));
+	for(int row = 0; row < combinations.size(); row++ ){
+		combinations[row][0] = 1;
+	}
 
-	for(int score = 1; score <= final_score; score++){
-		set<set<int>> temp;
-		for(int currPlay : individual_play_scores){
-			if(score >= currPlay && combinations[score-currPlay] > 0){
-				for(set<int> currset : uniqPlays[score - currPlay]){
-					set<int> curr(currset.begin(), currset.end());
-					curr.emplace(currPlay);
-					if(temp.find(curr) == temp.end()){
-						combinations[score] += 1;
-						temp.emplace(curr);
-					}
-				}
+	for(int playid = 0; playid < individual_play_scores.size(); playid++){
+		for(int targetscore = 1; targetscore <= final_score; targetscore++) {
+			if(playid == 0){
+				combinations[playid][targetscore] = (targetscore % individual_play_scores[playid] == 0)? 1 : 0;
+				continue;
+			}
+			for(int multiple = 0; multiple <= targetscore/individual_play_scores[playid]; multiple++){
+				combinations[playid][targetscore] += combinations[playid-1][targetscore - (multiple*individual_play_scores[playid])];
 			}
 		}
-		uniqPlays.emplace(score, temp);
 	}
-	return combinations[final_score];
+	return combinations[individual_play_scores.size()-1][final_score];
 }
 
 int main(int argc, char* argv[]) {
