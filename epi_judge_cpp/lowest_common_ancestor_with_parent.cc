@@ -6,7 +6,41 @@
 
 BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& node0,
                          const unique_ptr<BinaryTreeNode<int>>& node1) {
-  // TODO - you fill in here.
+  if(node0 == nullptr) return node1.get();
+  else if(node1 == nullptr) return node0.get();
+
+  int len0 = 0, len1 = 0;
+  BinaryTreeNode<int>* temp = node0.get();
+  while(temp->parent != nullptr){
+    len0++;
+    temp = temp->parent;
+  }
+
+  temp = node1.get();
+  while(temp->parent != nullptr){
+    len1++;
+    temp = temp->parent;
+  }
+
+  BinaryTreeNode<int>* node0t = node0.get();
+  while(len0 > len1){
+    node0t = node0t->parent;
+    len0--;
+  }
+
+  BinaryTreeNode<int>* node1t = node1.get();
+  while(len1 > len0){
+    node1t = node1t->parent;
+    len1--;
+  }
+
+  while(node0t != nullptr && node1t != nullptr){
+    if(node0t == node1t) return node0t;
+    else{
+      node0t = node0t->parent;
+      node1t = node1t->parent;
+    }
+  }
   return nullptr;
 }
 int LcaWrapper(TimedExecutor& executor,
