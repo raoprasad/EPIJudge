@@ -1,23 +1,61 @@
 #include <istream>
 #include <string>
+#include <queue>
 #include <vector>
+#include <unordered_set>
+#include <functional>
+#include <stack>
 #include "test_framework/generic_test.h"
 #include "test_framework/serialization_traits.h"
 #include "test_framework/test_failure.h"
 #include "test_framework/timed_executor.h"
-using std::vector;
+using namespace std;
 typedef enum { kWhite, kBlack } Color;
 struct Coordinate {
-  bool operator==(const Coordinate& that) const {
-    return x == that.x && y == that.y;
-  }
+    Coordinate(int _x, int _y){
+        this->x = _x;
+        this->y = _y;
+    }
+    bool operator==(const Coordinate& that) const {
+        return x == that.x && y == that.y;
+    }
 
-  int x, y;
+    int x, y;
 };
+class MyHash{
+public:
+    size_t operator()(Coordinate const& that) const noexcept{
+        std::hash<int> x, y;
+        return x(that.x) ^ (y(that.y) << 1);
+    }
+};
+bool DFS(vector<vector<Color>>& maze, int row, int col, vector<Coordinate>& path, unordered_set<Coordinate, MyHash>& seen, const Coordinate& e){
+    Coordinate cood(row,col);
+    if(row > maze.size() - 1 || col > maze[0].size() - 1 || row < 0 || col < 0 || seen.find(cood) != seen.end() || maze[row][col] == 1) return false;
+
+    seen.emplace(cood);
+    path.emplace_back(cood);
+
+    if(cood == e) return true;
+
+    if(!DFS(maze, row, col+1, path, seen, e)){
+        if(!DFS(maze, row+1, col, path, seen, e)) {
+            if (!DFS(maze, row, col - 1, path, seen, e)) {
+                if(!DFS(maze, row-1, col, path, seen, e)){
+                    path.pop_back();
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
 vector<Coordinate> SearchMaze(vector<vector<Color>> maze, const Coordinate& s,
                               const Coordinate& e) {
-  // TODO - you fill in here.
-  return {};
+    vector<Coordinate> path;
+    unordered_set<Coordinate, MyHash> seen;
+    DFS(maze, s.x,s.y,path,seen, e);
+    return path;
 }
 template <>
 struct SerializationTraits<Color> : SerializationTraits<int> {
