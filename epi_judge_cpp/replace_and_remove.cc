@@ -1,14 +1,35 @@
 #include <iterator>
 #include <string>
 #include <vector>
+#include <array>
 #include "test_framework/generic_test.h"
 #include "test_framework/timed_executor.h"
-using std::string;
-using std::vector;
+using namespace std;
 
 int ReplaceAndRemove(int size, char s[]) {
-  // TODO - you fill in here.
-  return 0;
+  if(size == 0) return 0;
+  int newsize = size;
+  int write = 0, read = 0;
+  while(read < size) {
+    if (s[read] == 'b'){
+      read++;
+      newsize--;
+    }
+    else{
+      swap(s[write++], s[read++]);
+    }
+  }
+  for(int i = 0; i < newsize; i++){
+    if(s[i] == 'a'){
+      for(int j = newsize; j > i + 1 ; j--){
+        swap(s[j], s[j-1]);
+      }
+      s[i] = s[i+1] = 'd';
+      newsize++;
+    }
+  }
+
+  return newsize;
 }
 vector<string> ReplaceAndRemoveWrapper(TimedExecutor& executor, int size,
                                        const vector<string>& s) {
