@@ -8,39 +8,31 @@ using namespace std;
 
 int ReplaceAndRemove(int size, char s[]) {
   if(size == 0) return 0;
-  for(int i = 0; i < size; i++){
-    if(s[i] == 'a'){
-      s[i] = 'd';
-      if(i < size-1 && s[i+1] == 'b' ){
-        s[i+1] = 'd';
-      }
-      else if(i == size-1 ){
-        s[i+1] = 'd';
-        size++;
-      }
-      else{
-        //insert and reposition the rest of array
-        for(int j = size; j > i+1; j--){
-          swap(s[j], s[j-1]);
-        }
-        s[i+1] = 'd';
-        size++;
-      }
+  int newsize = size, additions = 0;
+  int write = 0, read = 0;
+  while(read < size) {
+    if (s[read] == 'b'){
+      read++;
+      newsize--;
     }
-    else if(s[i] == 'b'){
-      int j = i+1;
-      while(j < size && s[j] == 'b')j++;
-      if(j < size ){
-        swap(s[i], s[j]);
-        if(s[i] == 'a'){
-          s[i] = 'd'; s[i+1] = 'd';
-          i++;
-        }
-      }
-      else size = i;
+    else if(s[read] == 'a'){
+      swap(s[write++], s[read++]);
+      additions++;
+    }
+    else{
+      swap(s[write++], s[read++]);
     }
   }
-  return size;
+  write = newsize + additions - 1, read = newsize - 1;
+  while(read >= 0){
+    swap(s[read--], s[write]);
+    if(s[write] == 'a'){
+      s[write] = s[write-1] = 'd';
+      write -= 2;
+    }else write--;
+  }
+
+  return newsize + additions;
 }
 
 vector<string> ReplaceAndRemoveWrapper(TimedExecutor& executor, int size,
