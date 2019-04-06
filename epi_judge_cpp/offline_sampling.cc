@@ -5,11 +5,27 @@
 #include "test_framework/generic_test.h"
 #include "test_framework/random_sequence_checker.h"
 #include "test_framework/timed_executor.h"
+#include <random>
+#include <unordered_set>
+using namespace std;
 using std::bind;
 using std::vector;
 void RandomSampling(int k, vector<int>* A_ptr) {
-  // TODO - you fill in here.
-  return;
+  vector<int>& A = (*A_ptr);
+  vector<int> res;
+  unordered_set<int> seen;
+  // obtain a seed from the system clock:
+  unsigned seed1 = std::chrono::system_clock::now().time_since_epoch().count();
+  mt19937 g1 (seed1);
+  uniform_int_distribution<int> distribution(0,A.size()-1);
+  while(k){
+    int randomIndex = distribution(g1);
+    if(seen.count(randomIndex) > 0) continue;
+    seen.emplace(randomIndex);
+    k--;
+    res.emplace_back(A[randomIndex]);
+  }
+  A.swap(res);
 }
 bool RandomSamplingRunner(TimedExecutor& executor, int k, vector<int> A) {
   vector<vector<int>> results;
