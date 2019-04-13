@@ -1,36 +1,39 @@
 #include "list_node.h"
 #include "test_framework/generic_test.h"
+#include <utility>
+using namespace std;
 
-pair<ListNode<int>*, ListNode<int>*> reverse(ListNode<int>* startN, int count){
-    ListNode<int>* prev = nullptr;
-    ListNode<int>* curr = startN;
+pair<shared_ptr<ListNode<int>>, shared_ptr<ListNode<int>>> reverse(shared_ptr<ListNode<int>> startN, int count){
+    shared_ptr<ListNode<int>> prev(nullptr);
+    shared_ptr<ListNode<int>> next(nullptr);
+    shared_ptr<ListNode<int>> curr = startN;
     while(count){
         count--;
-        ListNode<int>* next = curr->next.get();
-        curr->next = prev;
-        prev = curr;
-        curr = next;
+        next = move(curr->next);
+        curr->next = move(prev);
+        prev = move(curr);
+        curr = move(next);
     }
-    return {curr, next};
+    return make_pair(prev, curr);
 }
 
 shared_ptr<ListNode<int>> ReverseSublist(shared_ptr<ListNode<int>> L, int start,
                                          int finish) {
-    if(L == nullptr) return L;
-    ListNode<int>* startN = L.get(), prev = nullptr;
+    if(L == nullptr || start <= 0) return L;
+    shared_ptr<ListNode<int>> startN = L, prev(nullptr);
     int begin = start;
     while(--begin){
         prev = startN;
-        startN = startN->next.get();
+        startN = startN->next;
     }
-    pair<ListNode<int>*, ListNode<int>*> res = reverse(startN, finish - start + 1);
+    pair<shared_ptr<ListNode<int>>, shared_ptr<ListNode<int>>> res = reverse(startN, finish - start + 1);
 
-    startN->next = make_shared(res.second);
+    startN->next = res.second;
     if(prev != nullptr){
-        prev->next = make_shared(res.first);
+        prev->next = res.first;
     }
 
-    return (prev == nullptr)? make_shared(res.first) : L;
+    return (prev == nullptr)? res.first : L;
 }
 
 int main(int argc, char* argv[]) {
