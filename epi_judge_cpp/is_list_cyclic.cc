@@ -4,10 +4,38 @@
 #include "test_framework/test_failure.h"
 #include "test_framework/timed_executor.h"
 using std::shared_ptr;
-
+//a-b-c-d-e-f-g-h-b
 shared_ptr<ListNode<int>> HasCycle(const shared_ptr<ListNode<int>>& head) {
-  // TODO - you fill in here.
-  return nullptr;
+    if(head == nullptr) return nullptr;
+
+    shared_ptr<ListNode<int>> slow = head;
+    shared_ptr<ListNode<int>> fast = head->next;
+
+    while(slow != nullptr && fast != nullptr){
+        if(slow.get() == fast.get()){
+            //loop detected
+            //find cycle length
+            int cyclelen = 1;
+            while(slow->next.get() != fast.get()){
+                cyclelen++;
+                slow = slow->next;
+            }
+            slow = fast = head;
+
+            while(cyclelen--){
+                fast = fast->next;
+            }
+            while(slow.get() != fast.get()){
+                slow = slow->next;
+                fast = fast->next;
+            }
+            return slow;
+        }
+        slow = slow->next;
+        fast = (fast->next == nullptr)? nullptr : fast->next->next;
+    }
+
+    return nullptr;
 }
 void HasCycleWrapper(TimedExecutor& executor,
                      const shared_ptr<ListNode<int>>& head, int cycle_idx) {
