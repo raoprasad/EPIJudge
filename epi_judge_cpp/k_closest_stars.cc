@@ -4,7 +4,8 @@
 #include "test_framework/generic_test.h"
 #include "test_framework/serialization_traits.h"
 #include "test_framework/test_utils.h"
-using std::vector;
+#include <queue>
+using namespace std;
 
 struct Star {
   bool operator<(const Star& that) const {
@@ -16,11 +17,41 @@ struct Star {
   double x, y, z;
 };
 
+class compare{
+public:
+    bool operator()(const Star& lhs, const Star& rhs){
+        return lhs < rhs;
+    }
+};
+
 vector<Star> FindClosestKStars(vector<Star>::const_iterator stars_begin,
                                const vector<Star>::const_iterator& stars_end,
                                int k) {
-  // TODO - you fill in here.
-  return {};
+    priority_queue<Star, vector<Star>, function<bool(const Star& lhs, const Star& rhs)>> q(
+            [](const Star& lhs, const Star& rhs)->bool{return lhs < rhs;}
+            );
+    vector<Star>::const_iterator begin = stars_begin;
+    vector<Star> kclosest;
+    if(k == 0 || stars_begin == stars_end) return kclosest;
+
+    while(k-- && begin != stars_end){
+        q.emplace(*begin);
+        ++begin;
+    }
+
+    while(begin != stars_end){
+        if(*begin < q.top()){
+            q.pop();
+            q.emplace(*begin);
+        }
+        begin++;
+    }
+
+    while(!q.empty()){
+        kclosest.emplace_back(q.top());
+        q.pop();
+    }
+    return kclosest;
 }
 template <>
 struct SerializationTraits<Star> : UserSerTraits<Star, double, double, double> {
