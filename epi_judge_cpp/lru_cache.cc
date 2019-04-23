@@ -2,22 +2,90 @@
 #include "test_framework/generic_test.h"
 #include "test_framework/serialization_traits.h"
 #include "test_framework/test_failure.h"
+#include <unordered_map>
 
+using namespace std;;
+int iter = 0;
 class LruCache {
- public:
-  LruCache(size_t capacity) {}
-  int Lookup(int isbn) {
-    // TODO - you fill in here.
-    return 0;
-  }
-  void Insert(int isbn, int price) {
-    // TODO - you fill in here.
-    return;
-  }
-  bool Erase(int isbn) {
-    // TODO - you fill in here.
-    return true;
-  }
+private:
+    struct LRUNode{
+        int isbn;
+        int price;
+        LRUNode* next;
+        LRUNode* prev;
+        LRUNode(int _isbn, int _price): isbn(_isbn), price(_price), next(nullptr), prev(nullptr){}
+    };
+    unordered_map<int, LRUNode*> cache;
+    LRUNode* head = nullptr;
+    LRUNode* tail = nullptr;
+    int capacity = 0;
+public:
+    LruCache(size_t capacity) {
+        this->capacity = capacity;
+    }
+    int Lookup(int isbn) {
+        if(cache.find(isbn) != cache.end()){
+            LRUNode* curr = cache[isbn];
+            if(head == curr) return curr->price;
+            else curr->prev->next = curr->next;
+
+            if(curr == tail) tail = curr->prev;
+            else curr->next->prev = curr->prev;
+
+            head->prev = curr;
+            curr->next = head;
+            curr->prev = nullptr;
+            head = curr;
+            return curr->price;
+        }
+        return -1;
+}
+    void Insert(int isbn, int price) {
+        if(cache.find(isbn) != cache.end()){
+            Lookup(isbn);
+        }
+        else{
+            LRUNode* node = new LRUNode(isbn, price);
+            if(cache.size() == capacity){
+                Erase(tail->isbn);
+            }
+            if(head == nullptr){
+                tail = node;
+            }
+            else{
+                node->next = head;
+                head->prev = node;
+            }
+            head = node;
+            cache[isbn] = node;
+        }
+    }
+    bool Erase(int isbn) {
+        if(cache.find(isbn) == cache.end()) return false;
+        LRUNode* curr = cache[isbn];
+        cache.erase(curr->isbn);
+        if(head == tail){
+            head = tail = nullptr;
+        }
+        else if(head->next == tail){
+            if(curr == head){
+                head = curr->next;
+                head->prev = nullptr;
+            }
+            else{
+                tail = curr->prev;
+                tail->next = nullptr;
+            }
+        }
+        else{
+            if(curr->prev != nullptr) curr->prev->next = curr->next;
+            if(curr->next!= nullptr) curr->next->prev = curr->prev;
+            if(curr == head) head = curr->next;
+            if(curr == tail) tail = curr->prev;
+        }
+        delete curr;
+        return true;
+    }
 };
 struct Op {
   std::string code;
