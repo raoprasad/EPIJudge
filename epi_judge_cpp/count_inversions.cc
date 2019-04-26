@@ -3,8 +3,15 @@
 using std::vector;
 
 int CountInversions(vector<int> A) {
-  // TODO - you fill in here.
-  return 0;
+    int size = A.size();
+    if(size < 2) return 0;
+    int inversions = 0;
+    for(int i = 0; i < size-1; i++){
+        for(int j = i+1; j < size; j++){
+            if(A[i] > A[j]) inversions++;
+        }
+    }
+    return inversions;
 }
 
 int main(int argc, char* argv[]) {
