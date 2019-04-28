@@ -3,13 +3,22 @@
 using std::vector;
 
 int CountInversions(vector<int> A) {
-    int size = A.size();
-    if(size < 2) return 0;
-    int inversions = 0;
-    for(int i = 0; i < size-1; i++){
-        for(int j = i+1; j < size; j++){
-            if(A[i] > A[j]) inversions++;
+    if(A.size() <= 1) return 0;
+    int mid = A.size()/2;
+    vector<int> left(A.begin(), A.begin()+mid), right(A.begin()+mid, A.end());
+
+    int inversions = CountInversions(left);
+    inversions += CountInversions(right);
+    sort(left.begin(), left.end());
+    sort(right.begin(), right.end());
+
+    int leftId = 0, rightId = 0;
+    while(leftId < left.size() && rightId < right.size()){
+        if(left[leftId] > right[rightId] ){
+            inversions += left.size() - leftId;
+            rightId++;
         }
+        else leftId++;
     }
     return inversions;
 }
